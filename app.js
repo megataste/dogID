@@ -56,7 +56,7 @@ const CONFIG = {
   // 파일 주소(file://)나 로컬 주소는 공유 대상으로 사용하지 않습니다.
   publicUrl: "",
 
-  kakaoJavaScriptKey: ""
+  kakaoJavaScriptKey: "4475453f02e07547b8f24ee8f631e0d9 "
 };
 
 const $ = (id) => document.getElementById(id);
