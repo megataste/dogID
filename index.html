@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#fff5df">
+  <meta
+    name="description"
+    content="초코의 소개와 보호자 연락처를 확인할 수 있는 ANCHOR PET 반려견 명함입니다."
+  >
+
+  <title>초코의 반려견 명함 | ANCHOR PET</title>
+
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ko_KR">
+  <meta property="og:site_name" content="ANCHOR PET">
+  <meta property="og:title" content="초코의 반려견 명함 | ANCHOR PET">
+  <meta
+    property="og:description"
+    content="사람도, 산책도 좋아하는 우리 초코를 소개합니다."
+  >
+
+  <!--
+    파일 구성:
+      index.html
+      app.js
+
+    이 코드로 기존 index.html 전체를 교체하세요.
+    앞서 작성한 app.js는 그대로 유지하고 같은 폴더에 저장하세요.
+    HTML 안에 app.js의 JavaScript 내용을 다시 붙여 넣지 마세요.
+
+    반려견 정보 수정:
+      app.js의 CONFIG에서 이름, 사진, 전화번호 등을 수정하세요.
+      전화번호: CONFIG.phone
+      사진 경로: CONFIG.photo
+
+    추후 설정:
+      공개 명함 주소: CONFIG.publicUrl
+      카카오 JavaScript 키: CONFIG.kakaoJavaScriptKey
+      카카오 개발자 콘솔의 도메인 설정
+
+    기존 app.js는 로컬 파일 주소나 로컬 서버 주소의 공유를 제한합니다.
+    따라서 로컬에서 공유 버튼을 눌렀을 때 공개 주소 설정 안내가
+    나타나는 것은 JavaScript 연결 오류가 아닙니다.
+
+    카카오 SDK와 QR 라이브러리만 연결해 두었으며,
+    카카오 계정 연동이나 공개 주소 배포를 완료한 상태는 아닙니다.
+
+    SNS 미리보기용 og:url과 og:image는 실제 배포 후 추가하세요.
+    이름과 소개를 바꾸면 위 title과 meta 내용도 함께 수정하세요.
+  -->
+
+  <style>
+    :root {
+      --cream: #fff5df;
+      --paper: #fffbf3;
+      --yellow: #f8c44f;
+      --yellow-soft: #ffe49b;
+      --ink: #252b35;
+      --muted: #777065;
+      --line: #e8dcc6;
+      --shadow: 0 8px 24px rgb(106 77 30 / 9%);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px 12px;
+      background: #ece5d8;
+      color: var(--ink);
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Apple SD Gothic Neo",
+        "Malgun Gothic",
+        sans-serif;
+      line-height: 1.6;
+    }
+
+    button,
+    input,
+    a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible {
+      outline: 3px solid #88600d;
+      outline-offset: 4px;
+    }
+
+    .pet-card {
+      position: relative;
+      max-width: 580px;
+      margin: 0 auto;
+      padding: 28px 22px 35px;
+      overflow: hidden;
+      border-radius: 32px;
+      background:
+        radial-gradient(
+          circle at 105% 0%,
+          #ffdc7f 0 15%,
+          transparent 15.2%
+        ),
+        radial-gradient(
+          circle at -15% 35%,
+          #ffe3a2 0 23%,
+          transparent 23.2%
+        ),
+        var(--cream);
+      box-shadow: 0 20px 65px rgb(63 48 26 / 15%);
+    }
+
+    .pet-card::after {
+      position: absolute;
+      right: -5%;
+      bottom: -33px;
+      left: -5%;
+      height: 52px;
+      border-radius: 50% 50% 0 0;
+      background: var(--ink);
+      content: "";
+      pointer-events: none;
+    }
+
+    .brand {
+      margin-bottom: 25px;
+      text-align: center;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 65px;
+      height: 65px;
+      margin: 0 auto 8px;
+      place-items: center;
+      border: 2px solid var(--ink);
+      border-radius: 50%;
+      background: var(--paper);
+      font-size: 32px;
+    }
+
+    .brand-name {
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 4px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 18px;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .photo-frame {
+      position: relative;
+      min-width: 0;
+      aspect-ratio: 4 / 5;
+      overflow: hidden;
+      border: 5px solid rgb(255 255 255 / 65%);
+      border-radius: 100px 100px 28px 28px;
+      background: #f0d8a6;
+    }
+
+    .pet-photo {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .photo-fallback {
+      display: flex;
+      height: 100%;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 16px;
+      text-align: center;
+      color: #765d36;
+      font-size: 12px;
+    }
+
+    .photo-fallback span {
+      font-size: 72px;
+      line-height: 1;
+    }
+
+    .eyebrow {
+      margin: 0 0 4px;
+      color: #8d6d28;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 2px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(40px, 10vw, 66px);
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: -4px;
+      overflow-wrap: anywhere;
+    }
+
+    .pet-meta {
+      margin: 10px 0 16px;
+      font-size: 14px;
+      font-weight: 700;
+      word-break: keep-all;
+    }
+
+    .tags {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .tags li {
+      padding: 6px 4px;
+      border-radius: 30px;
+      background: var(--yellow-soft);
+      font-size: 12px;
+      font-weight: 700;
+      text-align: center;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+
+    .intro {
+      margin: 18px 0 0;
+      font-size: 16px;
+      font-weight: 700;
+      text-align: center;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+
+    .panel {
+      margin-top: 14px;
+      padding: 20px;
+      border: 1px solid rgb(255 255 255 / 90%);
+      border-radius: 24px;
+      background: rgb(255 251 243 / 93%);
+      box-shadow: var(--shadow);
+    }
+
+    .section-heading {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin: 0 0 9px;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .heading-icon {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      flex-shrink: 0;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--yellow-soft);
+      font-size: 20px;
+    }
+
+    .panel p {
+      margin: 0;
+      font-size: 14px;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+
+    .panel .muted {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .contact {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .contact-label {
+      margin-bottom: 3px !important;
+      font-size: 13px !important;
+      font-weight: 700;
+    }
+
+    .phone-number {
+      font-size: clamp(18px, 5vw, 27px);
+      font-weight: 900;
+      letter-spacing: -0.7px;
+      overflow-wrap: anywhere;
+    }
+
+    .primary-button,
+    .secondary-button {
+      display: inline-flex;
+      min-height: 46px;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 20px;
+      border: 0;
+      border-radius: 30px;
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .primary-button {
+      background: var(--yellow);
+    }
+
+    .secondary-button {
+      background: #eee8dd;
+    }
+
+    .health-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    .health-grid > div + div {
+      padding-left: 16px;
+      border-left: 1px solid var(--line);
+    }
+
+    .health-grid h3 {
+      margin: 0 0 6px;
+      font-size: 14px;
+    }
+
+    .health-grid p {
+      color: var(--muted);
+      font-size: 12px;
+      white-space: pre-line;
+    }
+
+    .share-panel {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0;
+      padding: 18px 8px;
+    }
+
+    .share-button {
+      display: flex;
+      min-width: 0;
+      min-height: 88px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 5px 2px;
+      border: 0;
+      background: transparent;
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .share-button + .share-button {
+      border-left: 1px solid var(--line);
+    }
+
+    .share-icon {
+      display: grid;
+      width: 48px;
+      height: 48px;
+      flex-shrink: 0;
+      place-items: center;
+      border-radius: 50%;
+      background: #f4e9d5;
+      font-size: 24px;
+    }
+
+    .share-icon.kakao {
+      background: #fee500;
+      color: #391b1b;
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .share-icon.social {
+      background: linear-gradient(
+        135deg,
+        #7545c3,
+        #d64982,
+        #f5b14d
+      );
+      color: white;
+    }
+
+    .share-icon svg {
+      display: block;
+      width: 25px;
+      height: 25px;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 2;
+    }
+
+    .privacy-note {
+      margin: 15px 8px 0;
+      color: var(--muted);
+      font-size: 11px;
+      text-align: center;
+      word-break: keep-all;
+    }
+
+    .footer {
+      padding: 28px 0 8px;
+      text-align: center;
+    }
+
+    .footer strong {
+      font-size: 15px;
+      letter-spacing: 4px;
+    }
+
+    .footer p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    dialog {
+      width: min(420px, calc(100% - 32px));
+      max-height: 90vh;
+      max-height: 90dvh;
+      padding: 25px;
+      overflow: auto;
+      border: 0;
+      border-radius: 24px;
+      background: var(--paper);
+      color: var(--ink);
+      box-shadow: 0 20px 70px rgb(0 0 0 / 20%);
+    }
+
+    dialog::backdrop {
+      background: rgb(25 28 35 / 55%);
+    }
+
+    .dialog-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .dialog-header h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .close-button {
+      width: 40px;
+      height: 40px;
+      flex-shrink: 0;
+      border: 0;
+      border-radius: 50%;
+      background: #eee8dd;
+      color: var(--ink);
+      font-size: 24px;
+    }
+
+    .dialog-description {
+      color: var(--muted);
+      font-size: 13px;
+      word-break: keep-all;
+    }
+
+    .dialog-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    #qrCanvas {
+      display: block;
+      width: min(100%, 280px);
+      height: auto;
+      margin: 18px auto;
+      background: white;
+    }
+
+    .url-field {
+      display: block;
+      width: 100%;
+      margin-top: 10px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: white;
+      color: var(--ink);
+      font-size: 16px;
+    }
+
+    .toast {
+      position: fixed;
+      z-index: 100;
+      right: 18px;
+      bottom: max(24px, env(safe-area-inset-bottom));
+      left: 18px;
+      width: fit-content;
+      max-width: min(430px, calc(100vw - 36px));
+      margin: auto;
+      padding: 13px 20px;
+      border-radius: 16px;
+      background: var(--ink);
+      color: white;
+      box-shadow: 0 6px 20px rgb(0 0 0 / 15%);
+      font-size: 13px;
+      text-align: center;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+      pointer-events: none;
+    }
+
+    @media (max-width: 380px) {
+      body {
+        padding: 0;
+      }
+
+      .pet-card {
+        padding: 24px 14px 34px;
+        border-radius: 0;
+      }
+
+      .hero {
+        gap: 12px;
+      }
+
+      .panel {
+        padding: 16px;
+      }
+
+      .share-panel {
+        padding: 14px 5px;
+      }
+
+      .pet-meta {
+        font-size: 12px;
+      }
+
+      .tags li {
+        font-size: 11px;
+      }
+    }
+  </style>
+
+  <!-- 카카오톡 공유용 SDK: 실제 키와 도메인은 나중에 설정하세요. -->
+  <script
+    defer
+    src="https://t1.kakaocdn.net/kakao_js_sdk/2.8.5/kakao.min.js"
+  ></script>
+
+  <!-- 기존 app.js의 window.QRious에 대응하는 QR 생성 라이브러리 -->
+  <script
+    defer
+    src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"
+  ></script>
+
+  <!-- 기존 app.js 연결: 파일 이름과 폴더 위치를 맞춰 주세요. -->
+  <script defer src="./app.js"></script>
+</head>
+
+<body>
+  <main class="pet-card">
+    <header class="brand">
+      <img src="C:\Users\kkore\OneDrive\바탕 화면\김성현 모두의 창업\webID\ai-image-17673.png" alt="샘플 이미지" height="100" width="100" />
+      <div class="brand-name">ANCHOR PET</div>
+    </header>
+
+    <section class="hero" aria-labelledby="petName">
+      <div class="photo-frame">
+        <img
+          id="petPhoto"
+          class="pet-photo"
+          alt="초코의 사진"
+          decoding="async"
+          hidden
+        >
+
+        <div id="photoFallback" class="photo-fallback">
+          <img src="C:\Users\kkore\OneDrive\바탕 화면\김성현 모두의 창업\webID\dog.png" alt="샘플 이미지" height="200" width="200" />
+      
+        </div>
+      </div>
+
+      <div>
+        <p class="eyebrow">MY BEST FRIEND</p>
+
+        <h1 id="petName">초코</h1>
+
+        <p id="petMeta" class="pet-meta">
+          골든 리트리버 · 3살 ♂
+        </p>
+
+        <ul
+          id="petTags"
+          class="tags"
+          aria-label="반려견 성격"
+        >
+          <li>추위를 많이타요</li>
+          <li>사교적이에요</li>
+          <li>활발해요</li>
+          <li>똑똑해요 ♥</li>
+        </ul>
+
+        <p id="petIntro" class="intro">
+          “사람도, 산책도 좋아하는 우리 초코예요!”
+        </p>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="mannersTitle">
+      <h2 id="mannersTitle" class="section-heading">
+        <span class="heading-icon" aria-hidden="true">🐾</span>
+        산책 매너 안내
+      </h2>
+
+      <p id="walkGuide">
+        초코는 다른 반려견과도 잘 지내지만,
+        처음 만나는 친구는 천천히 알아가요!
+      </p>
+
+      <p id="walkNote" class="muted">
+        다른 반려견에게 다가가기 전 보호자에게 먼저 물어봐 주세요.
+      </p>
+    </section>
+
+    <section class="panel contact" aria-label="보호자 연락처">
+      <div>
+        <p class="contact-label">보호자 연락처</p>
+
+        <div id="phoneNumber" class="phone-number">
+          연락처 미등록
+        </div>
+      </div>
+
+      <button
+        id="callButton"
+        class="primary-button"
+        type="button"
+      >
+        <span aria-hidden="true">☎</span>
+        전화걸기
+      </button>
+    </section>
+
+    <section class="panel" aria-labelledby="healthTitle">
+      <h2 id="healthTitle" class="section-heading">
+        <span class="heading-icon" aria-hidden="true">✚</span>
+        건강 · 응급 정보
+      </h2>
+
+      <div class="health-grid">
+        <div>
+          <h3>건강 정보</h3>
+          <p id="healthInfo">보호자에게 확인해 주세요.</p>
+        </div>
+
+        <div>
+          <h3>보호자 전달사항</h3>
+          <p id="emergencyInfo">도움이 필요하면 보호자에게 연락해 주세요.</p>
+        </div>
+      </div>
+    </section>
+
+    <nav class="panel share-panel" aria-label="명함 공유">
+      <button
+        id="kakaoButton"
+        class="share-button"
+        type="button"
+      >
+        <span class="share-icon kakao" aria-hidden="true">
+          TALK
+        </span>
+        <span>카카오톡</span>
+      </button>
+
+      <button
+        id="copyButton"
+        class="share-button"
+        type="button"
+      >
+        <span class="share-icon" aria-hidden="true">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            focusable="false"
+          >
+            <path
+              d="M10 13a5 5 0 0 0 7 .1l3-3a5 5 0 0 0-7-7l-2 2"
+            />
+            <path
+              d="M14 11a5 5 0 0 0-7-.1l-3 3a5 5 0 0 0 7 7l2-2"
+            />
+          </svg>
+        </span>
+        <span>링크 복사</span>
+      </button>
+
+      <button
+        id="snsButton"
+        class="share-button"
+        type="button"
+      >
+        <span class="share-icon social" aria-hidden="true">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            focusable="false"
+          >
+            <circle cx="18" cy="5" r="3" />
+            <circle cx="6" cy="12" r="3" />
+            <circle cx="18" cy="19" r="3" />
+            <path d="m8.6 10.5 6.8-4M8.6 13.5l6.8 4" />
+          </svg>
+        </span>
+        <span>SNS 공유</span>
+      </button>
+
+      <button
+        id="qrButton"
+        class="share-button"
+        type="button"
+      >
+        <span class="share-icon" aria-hidden="true">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            focusable="false"
+          >
+            <path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3z" />
+            <path
+              d="M15 15h3v3h3v3h-6zM21 12v3M12 3v3M12 12h3M3 12h3M12 18v3"
+            />
+          </svg>
+        </span>
+        <span>QR 공유</span>
+      </button>
+    </nav>
+
+    <p class="privacy-note">
+      이 명함을 공유하면 표시된 연락처와 반려견 정보도 함께 공개됩니다.
+    </p>
+
+    <footer class="footer">
+      <strong>ANCHOR PET</strong>
+      <p>반려동물과의 더 나은 오늘을 위한 브랜드</p>
+    </footer>
+
+    <noscript>
+      <p class="privacy-note">
+        보호자 연락처 표시와 공유 기능을 사용하려면
+        JavaScript를 활성화해 주세요.
+      </p>
+    </noscript>
+  </main>
+
+  <dialog
+    id="qrDialog"
+    aria-labelledby="qrTitle"
+    aria-describedby="qrDescription"
+  >
+    <div class="dialog-header">
+      <h2 id="qrTitle">명함 QR 공유</h2>
+
+      <button
+        class="close-button"
+        type="button"
+        data-close-dialog="qrDialog"
+        aria-label="QR 공유 창 닫기"
+      >
+        ×
+      </button>
+    </div>
+
+    <p id="qrDescription" class="dialog-description">
+      QR을 스캔하면 이 반려견 명함으로 연결됩니다.
+    </p>
+
+    <canvas
+      id="qrCanvas"
+      role="img"
+      aria-label="반려견 명함 QR 코드"
+    ></canvas>
+
+    <label for="qrUrl">명함 주소</label>
+
+    <input
+      id="qrUrl"
+      class="url-field"
+      type="url"
+      spellcheck="false"
+      readonly
+    >
+
+    <div class="dialog-actions">
+      <button
+        id="saveQrButton"
+        class="primary-button"
+        type="button"
+      >
+        QR 저장
+      </button>
+
+      <button
+        id="shareQrButton"
+        class="secondary-button"
+        type="button"
+        disabled
+      >
+        QR 이미지 공유
+      </button>
+    </div>
+
+    <p class="dialog-description">
+      이미지 공유를 지원하지 않는 환경에서는
+      QR을 저장한 뒤 원하는 앱에 직접 첨부해 주세요.
+    </p>
+  </dialog>
+
+  <dialog
+    id="linkDialog"
+    aria-labelledby="linkTitle"
+    aria-describedby="linkHelp"
+  >
+    <div class="dialog-header">
+      <h2 id="linkTitle">명함 링크</h2>
+
+      <button
+        class="close-button"
+        type="button"
+        data-close-dialog="linkDialog"
+        aria-label="명함 링크 창 닫기"
+      >
+        ×
+      </button>
+    </div>
+
+    <p id="linkHelp" class="dialog-description">
+      주소를 복사한 뒤 원하는 앱에 붙여넣어 주세요.
+    </p>
+
+    <label for="manualUrl">명함 주소</label>
+
+    <input
+      id="manualUrl"
+      class="url-field"
+      type="url"
+      spellcheck="false"
+      readonly
+    >
+
+    <div class="dialog-actions">
+      <button
+        id="manualCopyButton"
+        class="primary-button"
+        type="button"
+      >
+        링크 복사
+      </button>
+    </div>
+  </dialog>
+
+  <div
+    id="toast"
+    class="toast"
+    role="status"
+    aria-live="polite"
+    aria-atomic="true"
+    hidden
+  ></div>
+</body>
+</html>
