@@ -54,7 +54,7 @@ const CONFIG = {
 
   // 비워 두면 현재 페이지 주소를 사용합니다.
   // 파일 주소(file://)나 로컬 주소는 공유 대상으로 사용하지 않습니다.
-  publicUrl: "",
+  publicUrl: "https://megataste.github.io/dogID/",
 
   kakaoJavaScriptKey: "4475453f02e07547b8f24ee8f631e0d9"
 };
