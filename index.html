@@ -592,11 +592,16 @@
     }
   </style>
 
-  <!-- 카카오톡 공유용 SDK: 실제 키와 도메인은 나중에 설정하세요. -->
-  <script
-    defer
-    src="https://t1.kakaocdn.net/kakao_js_sdk/2.8.5/kakao.min.js"
-  ></script>
+<!-- 카카오톡 공유 SDK -->
+<script
+  defer
+  src="https://t1.kakaocdn.net/kakao_js_sdk/2.8.5/kakao.min.js"
+  integrity="sha384-v6JKY3z4FUkWq21oZDHZe74YvuPk/WUrVLrDHTBojHXClOSa3iXy7sCXPY1jkFbj"
+  crossorigin="anonymous"
+></script>
+
+<!-- 명함 기능: index.html과 같은 폴더에 저장 -->
+<script defer src="./app.js"></script>
 
   <!-- 기존 app.js의 window.QRious에 대응하는 QR 생성 라이브러리 -->
   <script
