@@ -14,6 +14,7 @@
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ko_KR">
   <meta property="og:site_name" content="ANCHOR PET">
+  <meta property="og:site_name" content="ANCHOR PET">
   <meta property="og:title" content="초코의 반려견 명함 | ANCHOR PET">
   <meta
     property="og:description"
@@ -592,13 +593,6 @@
     }
   </style>
 
-<!-- 카카오톡 공유 SDK -->
-<script
-  defer
-  src="https://t1.kakaocdn.net/kakao_js_sdk/2.8.5/kakao.min.js"
-  integrity="sha384-v6JKY3z4FUkWq21oZDHZe74YvuPk/WUrVLrDHTBojHXClOSa3iXy7sCXPY1jkFbj"
-  crossorigin="anonymous"
-></script>
 
 <!-- 명함 기능: index.html과 같은 폴더에 저장 -->
 
@@ -610,7 +604,8 @@
   ></script>
 
   <!-- 기존 app.js 연결: 파일 이름과 폴더 위치를 맞춰 주세요. -->
-  <script defer src="./app.js"></script>
+    <script defer src="kakao.min.js"></script>
+    <script defer src="./app.js"></script>
 </head>
 
 <body>
@@ -727,7 +722,26 @@
         </span>
         <span>카카오톡</span>
       </button>
+            <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.8.5/kakao.min.js" integrity="sha384-v6JKY3z4FUkWq21oZDHZe74YvuPk/WUrVLrDHTBojHXClOSa3iXy7sCXPY1jkFbj" crossorigin="anonymous"></script>
 
+        <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js"
+            crossorigin="anonymous"></script>
+
+        <script>
+            if (!Kakao.isInitialized()) {
+                Kakao.init("4475453f02e07547b8f24ee8f631e0d9");
+            }
+
+            function shareMessage() {
+    // 카카오톡 공유 대상 선택 화면을 표시하는 함수
+            Kakao.Share.sendCustom({
+                templateId: 139201,
+                templateArgs: {
+                NAME: "초코"
+                }
+            });
+            }
+        </script>
       <button
         id="copyButton"
         class="share-button"
