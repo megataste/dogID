@@ -224,7 +224,7 @@ function callGuardian() {
     return;
   }
 
-  if (phone === "01012345678") {
+  if (phone === "01000000000") {
     showToast("예시 번호입니다. 실제 보호자 연락처로 변경해 주세요.");
     return;
   }
