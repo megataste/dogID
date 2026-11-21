@@ -47,7 +47,7 @@ const CONFIG = {
   walkNote:
     "다른 반려견에게 다가가기 전 보호자에게 먼저 물어봐 주세요.",
 
-  phone: "010-1234-5678",
+  phone: "010-3803-6962",
 
   healthInfo: "알레르기 : 닭고기.",
   emergencyInfo: "쓸개골 탈구 / 복용중 : 카프로펜(리마딜).",
